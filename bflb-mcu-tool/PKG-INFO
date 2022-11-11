@@ -1,0 +1,56 @@
+Metadata-Version: 2.1
+Name: bflb-mcu-tool
+Version: 1.8.0
+Summary: Bouffalolab Mcu Tool
+Home-page: https://pypi.org/project/bflb-mcu-tool/
+Author: bouffalolab
+Author-email: jxtan@bouffalolab.com
+License: MIT
+Description:
+        ## Bouffalolab Mcu Command Tool
+        ====================================
+
+        The functions of bflb_mcu_tool is the same as DevCube(MCU View) which is a GUI tool for image programing.
+        bflb_mcu_tool is designed for the convenience of integrating into the compilation system after image buid,
+        and making it more easy for users who are accustomed to using command line operations.
+
+        ### basic download config:
+
+        * --chipname：mandatory, name of chip(bl602/bl702/bl616...)
+        * --interface：1.uart, 2.jlink, 3.cklink, 4.openocd, default is uart
+        * --bootsrc：1.flash, 2.uart/sdio, 3.uart/usb, default is flash
+        * --port：serial port or jlink serial number
+        * --baudrate：baudrate of serial port, default is 115200
+        * --xtal：xtal on the board, for bl602,1:24M,2:32M,3:38.4M,4:40M(default value when not specified),5:26M; for bl702,1:32M(default value when not specified); for bl616,just use value 7(auto adjust)
+        * --config：eflash loader configuration file,default is chips/blXXXX/eflash_loader/eflash_loader_cfg.ini
+        * --flashclk：clock of flash
+        * --pllclk：clock of pll
+
+        ### files for download:
+
+        * --firmware：mandatory, select the firmware binary file which your sdk build out
+        * --dts：optional,select the device tree file you used
+        * --addr：address to program, default is 0x2000
+        * --erase：erase the whole flash
+
+        ### other options:
+
+        * --build：build image only
+
+        ### EXAMPLE:
+        * bflb_mcu_tool.exe --chipname=bl602 --port=COM28 --baudrate=2000000 --firmware="helloworld_bl602.bin"
+        * bflb_mcu_tool.exe --chipname=bl602 --port=COM28 --baudrate=2000000 --firmware="helloworld_bl602.bin" --erase
+        * bflb_mcu_tool.exe --chipname=bl602 --port=COM28 --baudrate=2000000 --firmware="helloworld_bl602.bin" --build
+
+
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft
+Classifier: Operating System :: Unix
+Classifier: Environment :: Console
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >3.0,<4.0
+Description-Content-Type: text/markdown
