@@ -3,6 +3,7 @@ AS = $(CROSS_COMPILE)as
 LD = $(CROSS_COMPILE)ld
 
 CHIP = bl602
+PORT = /dev/ttyUSB0
 
 all: $(CHIP)_app.elf
 
@@ -15,5 +16,8 @@ clean:
 %_app.o: %_app.s
 	$(AS) -o $@ $<
 
-.PHONY: all clean
+run: $(CHIP)_header_cfg.conf $(CHIP)_app.elf
+	python loader.py -c $(CHIP) -p $(PORT) -C $^
+
+.PHONY: all clean run
 .SECONDARY:
