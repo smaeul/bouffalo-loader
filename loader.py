@@ -201,7 +201,8 @@ def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_p
         segments = []
         for elf_segment in elf_file.iter_segments():
             # Skip non-loadable segments.
-            if elf_segment.header.p_filesz == 0:
+            if elf_segment.header.p_filesz == 0 or \
+               elf_segment.header.p_type != 'PT_LOAD':
                 continue
             segments.append((
                 SegmentHeader.from_elf_segment(elf_segment),
