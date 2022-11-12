@@ -3,23 +3,39 @@
 # SPDX-License-Identifier: MIT
 #
 
-CROSS_COMPILE = riscv32-linux-musl-
-CC = $(CROSS_COMPILE)cc
-LD = $(CROSS_COMPILE)ld
+CROSS_COMPILE	= riscv32-linux-musl-
+CC		= $(CROSS_COMPILE)gcc
 
-CHIP = bl602
-PORT = /dev/ttyUSB0
+CFLAGS		= -ffreestanding \
+		  -ffunction-sections \
+		  -fno-builtin \
+		  -fno-common \
+		  -fno-pie \
+		  -mabi=ilp32 \
+		  -march=rv32i \
+		  -O2 \
+		  -std=gnu11 \
+		  -Wall \
+		  -Wextra \
+		  -Wno-unused
+LDFLAGS		= -no-pie \
+		  -nostdlib \
+		  -static \
+		  -Wl,-O1 \
+		  -Wl,--gc-sections \
+		  -Wl,--no-dynamic-linker \
+		  -Wl,--no-undefined
+
+CHIP		= bl602
+PORT		= /dev/ttyUSB0
 
 all: $(CHIP)_app.elf
 
 clean:
 	rm -f *.elf *.o
 
-%_app.elf: %_app.ld %_app.o
-	$(LD) -o $@ -T $^
-
-%_app.o: %_app.S
-	$(CC) -o $@ -c $< -fno-pic -mabi=ilp32 -march=rv32i
+%_app.elf: %_app.ld %_app.c %_app.S
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -T $^
 
 run: $(CHIP)_header_cfg.conf $(CHIP)_app.elf
 	python loader.py -c $(CHIP) -p $(PORT) -C $^

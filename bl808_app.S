@@ -6,7 +6,6 @@
 #define BIT(n)				(1 << (n))
 
 #define GLB_BASE			0x20000000
-#define UART0_BASE			0x2000a000
 
 #define GLB_UART_CFG0_OFFSET		0x150
 #define GLB_UART_CFG1_OFFSET		0x154
@@ -92,43 +91,10 @@ start:
 	li	a1, (3 << 4) | (2 << 0)
 	sw	a1, GLB_UART_CFG1_OFFSET(a0)
 
-	// Disable UART0 interrupts
-	la	a0, UART0_BASE
-	sw	zero, 0x2c(a0)
-
-	// Clear UART0 FIFOs and disable DMA
-	li	a1, BIT(3) | BIT(2)
-	sw	a1, 0x80(a0)
-
-	// Configure UART0 for free running mode
-	lw	a2, 0(a0)
-	ori	a2, a2, 0x3
-	xori	a2, a2, 0x2
-	sw	a2, 0(a0)
-
-	// Send a message out on UART0
-	li	a6, -10
-
-3:
-	la	a2, message
-
-2:
-	lbu	a1, 0(a2)
-	beqz	a1, 9f
-
-1:
-	lw	a3, 0x84(a0)
-	andi	a3, a3, 0x3f
-	beqz	a3, 1b
-
-	sw	a1, 0x88(a0)
-	addi	a2, a2, 1
-	j	2b
-
-9:
-	addi	a6, a6, 1
-	bnez	a6, 3b
 #endif
+
+	la	sp, __stack_end
+	jal	main
 
 	// Reset the MCU
 	li	a0, GLB_BASE
@@ -136,7 +102,3 @@ start:
 	ori	a1, a1, 1
 	sw	a1, GLB_SWRST_CFG2_OFFSET(a0)
 	j	.
-
-	.section .rodata
-message:
-	.asciz "Hello, world!\r\n"
