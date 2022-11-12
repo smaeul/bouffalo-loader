@@ -26,7 +26,7 @@ LDFLAGS		= -no-pie \
 		  -Wl,--no-dynamic-linker \
 		  -Wl,--no-undefined
 
-CHIP		= bl602
+CHIP		= bl808
 PORT		= /dev/ttyUSB0
 
 all: $(CHIP)_app.elf
