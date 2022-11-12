@@ -1,3 +1,8 @@
+/*
+ * Copyright © 2022 Samuel Holland <samuel@sholland.org>
+ * SPDX-License-Identifier: GPL-2.0-only
+ */
+
 OUTPUT_ARCH(riscv)
 OUTPUT_FORMAT(elf32-littleriscv)
 

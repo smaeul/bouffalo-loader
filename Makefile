@@ -1,3 +1,8 @@
+#
+# Copyright © 2022 Samuel Holland <samuel@sholland.org>
+# SPDX-License-Identifier: MIT
+#
+
 CROSS_COMPILE = riscv32-linux-musl-
 CC = $(CROSS_COMPILE)cc
 LD = $(CROSS_COMPILE)ld

@@ -1,3 +1,8 @@
+#
+# Copyright © 2022 Samuel Holland <samuel@sholland.org>
+# SPDX-License-Identifier: MIT
+#
+
 import logging
 import sys
 import time
