@@ -26,15 +26,19 @@ SECTIONS {
 
   .data . : AT(. - 0x20000000) ALIGN(16) {
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.data*)))
+    *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.sdata*)))
     . = ALIGN(16);
   } > DRAM
 
   .bss . : AT(. - 0x20000000) ALIGN(16) {
     __bss_start = .;
+    *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.sbss*)))
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
     . = ALIGN(16);
     __bss_end = .;
   } > DRAM
 
   __stack_start = .;
+  . += 0x1000;
+  __stack_end = .;
 }

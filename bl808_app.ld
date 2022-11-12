@@ -23,13 +23,19 @@ SECTIONS {
 
   .data . : ALIGN(16) {
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.data*)))
+    *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.sdata*)))
     . = ALIGN(16);
   } > RAM
 
   .bss . : ALIGN(16) {
     __bss_start = .;
+    *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.sbss*)))
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
     . = ALIGN(16);
     __bss_end = .;
   } > RAM
+
+  __stack_start = .;
+  . += 0x1000;
+  __stack_end = .;
 }
