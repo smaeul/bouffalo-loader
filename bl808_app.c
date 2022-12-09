@@ -4,7 +4,6 @@
  */
 
 #include <stdbool.h>
-#include <linux/errno.h>
 
 #define BIT(n)				(1 << (n))
 #define GENMASK(h, l)			((0xffffffffU << (l)) & (0xffffffffU >> (31 - (h))))
@@ -102,7 +101,7 @@ static int bflb_uart_getc(struct udevice *dev)
 	struct bflb_uart_plat *plat = dev_get_plat(dev);
 
 	if (bflb_uart_pending(dev, true) == 0)
-		return -EAGAIN;
+		return -1;
 
 	return readl(plat->base + UART_FIFO_RDATA);
 }
