@@ -28,6 +28,7 @@ LDFLAGS		= -no-pie \
 
 CHIP		= bl808
 PORT		= /dev/ttyUSB0
+BAUD		= 2000000
 
 all: $(CHIP)_app.elf
 
@@ -38,7 +39,7 @@ clean:
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -T $^
 
 run: $(CHIP)_header_cfg.conf $(CHIP)_app.elf
-	python3 loader.py -c $(CHIP) -p $(PORT) -C $^
+	python3 loader.py -c $(CHIP) -p $(PORT) -b $(BAUD) -C $^
 
 .PHONY: all clean run
 .SECONDARY:
