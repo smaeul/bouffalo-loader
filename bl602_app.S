@@ -6,6 +6,9 @@
 	.section .text
 	.global start
 start:
+	la	sp, __stack_end
+	jal	main
+
 	la	a0, 0x40000000
 	lw	a1, 0x18(a0)
 	ori	a1, a1, 1
