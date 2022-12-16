@@ -240,13 +240,14 @@ def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_p
                     raise Exception('Unexpected response')
 
         logger.info('Sending handshake...')
-        serial.write(b'U' * 32)
-        if chip == Chip.BL808:
-            time.sleep(0.1)
-            serial.write(bytes.fromhex('5000080038F0002000000018'))
-        time.sleep(0.1)
-        if serial.read(2) != b'OK':
-            raise Exception('Handshake failed')
+        serial.timeout = 0.1
+        while True:
+            serial.write(b'U' * 32)
+            if chip == Chip.BL808:
+                serial.write(bytes.fromhex('5000080038F0002000000018'))
+            if serial.read(2) == b'OK':
+                break
+        serial.timeout = None
 
         logger.info('Sending boot header...')
         send_command(0x11, bytes(boot_header))
