@@ -257,6 +257,10 @@ def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_p
                 err = int.from_bytes(serial.read(2), 'little')
                 raise Exception(f'Command {cmd:#x} failed: {err:#06x}')
             # Some commands produce a response that must be handled.
+            if cmd == Command.GET_BOOT_INFO:
+                length = int.from_bytes(serial.read(2), 'little')
+                response = serial.read(length)
+                logger.info(f'Boot info: {response.hex()}')
             if cmd == Command.LOAD_SEG_HEADER:
                 length = int.from_bytes(serial.read(2), 'little')
                 if length != len(data):
@@ -274,6 +278,9 @@ def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_p
             if serial.read(2) == b'OK':
                 break
         serial.timeout = None
+
+        logger.info('Getting boot info...')
+        send_command(Command.GET_BOOT_INFO, b'')
 
         logger.info('Sending boot header...')
         send_command(Command.LOAD_BOOT_HEADER, bytes(boot_header))
