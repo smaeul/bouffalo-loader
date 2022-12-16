@@ -259,8 +259,11 @@ def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_p
             # Some commands produce a response that must be handled.
             if cmd == Command.LOAD_SEG_HEADER:
                 length = int.from_bytes(serial.read(2), 'little')
-                if serial.read(length) != data:
-                    raise Exception('Unexpected response')
+                if length != len(data):
+                    raise Exception('Unexpected response length')
+                # Discard the response. Unless the firmware is encrypted,
+                # it will be identical to the segment header we just sent.
+                serial.read(length)
 
         logger.info('Sending handshake...')
         serial.timeout = 0.1
