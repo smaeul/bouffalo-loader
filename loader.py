@@ -36,6 +36,29 @@ class Chip(Enum):
         return self.value
 
 
+class Command(Enum):
+    GET_CHIP_ID         = 0x05
+    GET_BOOT_INFO       = 0x10
+    LOAD_BOOT_HEADER    = 0x11
+    LOAD_PUBLIC_KEY     = 0x12
+    LOAD_PUBLIC_KEY2    = 0x13
+    LOAD_SIGNATURE      = 0x14
+    LOAD_SIGNATURE2     = 0x15
+    LOAD_AES_IV         = 0x16
+    LOAD_SEG_HEADER     = 0x17
+    LOAD_SEG_DATA       = 0x18
+    CHECK_IMAGE         = 0x19
+    RUN_IMAGE           = 0x1a
+    CHANGE_RATE         = 0x20
+    RESET               = 0x21
+    FLASH_ERASE         = 0x30
+    FLASH_WRITE         = 0x31
+    FLASH_READ          = 0x32
+    FLASH_BOOT          = 0x33
+    EFUSE_WRITE         = 0x40
+    EFUSE_READ          = 0x41
+
+
 def make_boot_header_fields(chip: Chip):
     def keys_to_tuples() -> Sequence[Tuple[int, int, int, str]]:
         '''
@@ -226,15 +249,15 @@ def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_p
         boot_header.update_crc32()
 
     with Serial(str(serial_port), baud) as serial:
-        def send_command(cmd: int, data: bytes):
-            serial.write(ISPCommand(cmd=cmd, length=len(data)))
+        def send_command(cmd: Command, data: bytes):
+            serial.write(ISPCommand(cmd=cmd.value, length=len(data)))
             serial.write(data)
             status = serial.read(2)
             if status != b'OK':
                 err = int.from_bytes(serial.read(2), 'little')
                 raise Exception(f'Command {cmd:#x} failed: {err:#06x}')
             # Some commands produce a response that must be handled.
-            if cmd == 0x17:
+            if cmd == Command.LOAD_SEG_HEADER:
                 length = int.from_bytes(serial.read(2), 'little')
                 if serial.read(length) != data:
                     raise Exception('Unexpected response')
@@ -250,19 +273,19 @@ def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_p
         serial.timeout = None
 
         logger.info('Sending boot header...')
-        send_command(0x11, bytes(boot_header))
+        send_command(Command.LOAD_BOOT_HEADER, bytes(boot_header))
         for segment_header, data in segments:
             logger.info(f'Sending segment {segment_header.address:08x}+{segment_header.length:08x}')
-            send_command(0x17, bytes(segment_header))
+            send_command(Command.LOAD_SEG_HEADER, bytes(segment_header))
             while data:
                 chunk, data = data[:MAX_CHUNK_SIZE], data[MAX_CHUNK_SIZE:]
-                send_command(0x18, chunk)
+                send_command(Command.LOAD_SEG_DATA, chunk)
 
         logger.info('Checking image...')
-        send_command(0x19, b'')
+        send_command(Command.CHECK_IMAGE, b'')
 
         logger.info('Running image...')
-        send_command(0x1a, b'')
+        send_command(Command.RUN_IMAGE, b'')
 
 
 def main():
