@@ -27,10 +27,11 @@ LDFLAGS		= -no-pie \
 		  -Wl,--no-undefined
 
 CHIP		= bl808
+CHIPS		= bl602 bl808
 PORT		= /dev/ttyUSB0
 BAUD		= 2000000
 
-all: $(CHIP)_app.elf
+all: $(foreach chip,$(CHIPS),$(chip)_app.elf)
 
 clean:
 	rm -f *.elf *.o
