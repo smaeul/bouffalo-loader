@@ -188,7 +188,7 @@ boot_header_sections = {
 MAX_CHUNK_SIZE = 4096
 
 
-def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_port: Path):
+def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_port: Path, baud: int):
     boot_header_class = boot_header_classes[chip]
     if cfg_path:
         cfg_section = boot_header_sections[chip]
@@ -225,7 +225,7 @@ def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_p
         boot_header.update_hash(image_hash.digest())
         boot_header.update_crc32()
 
-    with Serial(str(serial_port), 115200) as serial:
+    with Serial(str(serial_port), baud) as serial:
         def send_command(cmd: int, data: bytes):
             serial.write(ISPCommand(cmd=cmd, length=len(data)))
             serial.write(data)
@@ -268,6 +268,9 @@ def load_elf_file(chip: Chip, cfg_path: Optional[Path], elf_path: Path, serial_p
 def main():
     parser = ArgumentParser(prog='loader',
                             description="Load an ELF to the MCU's RAM and execute it.")
+    parser.add_argument('-b', '--baud',
+                        help='Serial port baud rate',
+                        default=115200, type=int)
     parser.add_argument('-C', '--cfg',
                         help='Config file with values for boot header fields',
                         type=Path)
@@ -284,7 +287,7 @@ def main():
 
     logging.basicConfig(level=logging.DEBUG)
     try:
-        load_elf_file(args.chip, args.cfg, args.firmware, args.port)
+        load_elf_file(args.chip, args.cfg, args.firmware, args.port, args.baud)
     except Exception as e:
         logger.exception('Failed to communicate with the MCU')
 
