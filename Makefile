@@ -38,7 +38,7 @@ clean:
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -T $^
 
 run: $(CHIP)_header_cfg.conf $(CHIP)_app.elf
-	python loader.py -c $(CHIP) -p $(PORT) -C $^
+	python3 loader.py -c $(CHIP) -p $(PORT) -C $^
 
 .PHONY: all clean run
 .SECONDARY:
