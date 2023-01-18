@@ -5,6 +5,7 @@
 
 CROSS_COMPILE	= riscv32-linux-musl-
 CC		= $(CROSS_COMPILE)gcc
+OBJCOPY		= $(CROSS_COMPILE)objcopy
 
 CFLAGS		= -ffreestanding \
 		  -ffunction-sections \
@@ -31,10 +32,13 @@ CHIPS		= bl602 bl808
 PORT		= /dev/ttyUSB0
 BAUD		= 2000000
 
-all: $(foreach chip,$(CHIPS),$(chip)_app.elf)
+all: $(foreach chip,$(CHIPS),$(chip)_app.bin)
 
 clean:
-	rm -f *.elf *.ld *.o
+	rm -f *.bin *.elf *.ld *.o
+
+%.bin: %.elf
+	$(OBJCOPY) -O binary $< $@
 
 %.ld: %.ld.S
 	$(CC) $(CFLAGS) -o $@ -E -P $^
