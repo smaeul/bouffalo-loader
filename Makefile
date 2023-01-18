@@ -34,7 +34,10 @@ BAUD		= 2000000
 all: $(foreach chip,$(CHIPS),$(chip)_app.elf)
 
 clean:
-	rm -f *.elf *.o
+	rm -f *.elf *.ld *.o
+
+%.ld: %.ld.S
+	$(CC) $(CFLAGS) -o $@ -E -P $^
 
 %_app.elf: %_app.ld %_app.c %_app.S
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -T $^
