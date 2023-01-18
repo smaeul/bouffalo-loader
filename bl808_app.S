@@ -26,6 +26,23 @@
 	.section .text
 	.global start
 start:
+#ifdef CONFIG_XIP
+	la	a0, __data_start
+	la	a1, __data_end
+	la	a3, __data_flash
+1:	lw	a2, 0(a3)
+	sw	a2, 0(a0)
+	addi	a0, a0, 4
+	addi	a3, a3, 4
+	blt	a0, a1, 1b
+#endif
+
+	la	a0, __bss_start
+	la	a1, __bss_end
+1:	sw	zero, 0(a0)
+	addi	a0, a0, 4
+	blt	a0, a1, 1b
+
 	li	a0, GPIO_BASE
 
 #if 0

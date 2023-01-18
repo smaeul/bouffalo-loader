@@ -9,34 +9,37 @@ OUTPUT_FORMAT(elf32-littleriscv)
 ENTRY (start)
 
 MEMORY {
-  RAM (rwx): ORIGIN = 0x22020000, LENGTH = 0x38000
+#ifdef CONFIG_XIP
+  RAM (rw): ORIGIN = 0x22020000, LENGTH = 0x00038000
+  XIP (rx): ORIGIN = 0x58000000, LENGTH = 0x00100000
+#else
+  RAM (rwx): ORIGIN = 0x22020000, LENGTH = 0x00038000
+#define XIP RAM
+#endif
 }
 
 SECTIONS {
-  . = ORIGIN(RAM);
-
-  .text . : ALIGN(16) {
+  .text : ALIGN(16) {
     KEEP(*(.text.start))
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.text*)))
-    . = ALIGN(16);
-  } > RAM
+  } > XIP
 
-  .rodata . : ALIGN(16) {
+  .rodata : ALIGN(16) {
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.rodata*)))
-    . = ALIGN(16);
-  } > RAM
+  } > XIP
 
-  .data . : ALIGN(16) {
+  .data : ALIGN(16) {
+    __data_flash = LOADADDR(.data);
+    __data_start = .;
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.data*)))
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.sdata*)))
-    . = ALIGN(16);
-  } > RAM
+    __data_end = .;
+  } > RAM AT> XIP
 
-  .bss . : ALIGN(16) {
+  .bss : ALIGN(16) {
     __bss_start = .;
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.sbss*)))
     *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
-    . = ALIGN(16);
     __bss_end = .;
   } > RAM
 
